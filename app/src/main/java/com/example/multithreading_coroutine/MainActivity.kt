@@ -1,10 +1,13 @@
 package com.example.multithreading_coroutine
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.multithreading_coroutine.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -45,7 +48,40 @@ class MainActivity : AppCompatActivity() {
            CoroutineScope(Dispatchers.IO).launch{ startDownload() }
         }
 
+
+        // Sequential  and parallel coroutines
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.v("TAG", "The App started")
+
+            // Remove async to do sequential coroutines
+            //This is parallel coroutine
+
+            val one = async {
+                doSomeThingUseful1()
+            }
+            val two = async {
+                doSomeThingUseful2()
+            }
+
+            val result = one.await() + two.await()
+            Log.v("TAG", "The Result is: $result")
+
+        }
+
     }
+
+    suspend fun doSomeThingUseful1() : Int{
+        delay(9000)
+        Log.v("TAG", "Fun1 is DONE")
+        return 11
+    }
+
+    suspend fun doSomeThingUseful2() : Int{
+        delay(7000)
+        Log.v("TAG", "Fun2 is DONE")
+        return 8
+    }
+
 
     private suspend fun startDownload() {
         for (i in 1..100000) {
